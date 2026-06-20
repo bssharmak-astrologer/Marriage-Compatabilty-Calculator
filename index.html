@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="te">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#7C2D3B">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="నక్షత్ర పొంతన">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+<title>నక్షత్ర పొంతన | Nakshatra Porutham Calculator</title>
+<style>
+  :root{
+    --maroon:#7C2D3B;
+    --maroon-dark:#5A1F2A;
+    --gold:#B8862F;
+    --gold-light:#D9B45C;
+    --cream:#FAF3E6;
+    --cream-deep:#F1E6D2;
+    --ink:#3A2618;
+    --ink-soft:#6B5847;
+    --line:#E3D4B8;
+    --good:#3F6B4A;
+    --warn:#A8492F;
+    font-family: "Noto Sans Telugu","Nirmala UI","Gautami","Segoe UI",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(1200px 600px at 10% -10%, #FFFBF3 0%, transparent 60%),
+      radial-gradient(1000px 600px at 110% 10%, #FFF6E6 0%, transparent 55%),
+      var(--cream);
+    color:var(--ink);
+    min-height:100vh;
+    padding:28px 16px 60px;
+  }
+  .wrap{max-width:880px;margin:0 auto;}
+
+  header.top{text-align:center;margin-bottom:30px;}
+  .kalasha{
+    width:54px;height:54px;margin:0 auto 10px;
+    display:block;
+  }
+  h1{
+    font-size:30px;
+    margin:0 0 4px;
+    color:var(--maroon-dark);
+    letter-spacing:0.2px;
+  }
+  h1 .en{
+    display:block;
+    font-size:14px;
+    font-weight:600;
+    color:var(--ink-soft);
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    margin-top:6px;
+  }
+  .sub{color:var(--ink-soft);font-size:14.5px;max-width:540px;margin:10px auto 0;line-height:1.5;}
+
+  .rule{
+    height:3px;
+    width:120px;
+    margin:18px auto 0;
+    background:linear-gradient(90deg, transparent, var(--gold), transparent);
+    border-radius:3px;
+  }
+
+  .panels{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+    margin-top:30px;
+  }
+  @media (max-width:640px){ .panels{grid-template-columns:1fr;} }
+
+  .card{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:22px 20px 24px;
+    box-shadow:0 2px 14px rgba(122,46,46,0.06);
+    position:relative;
+    overflow:hidden;
+  }
+  .card::before{
+    content:"";
+    position:absolute; top:0; left:0; right:0; height:5px;
+    background:linear-gradient(90deg, var(--gold) 0%, var(--maroon) 100%);
+  }
+  .card h2{
+    margin:6px 0 18px;
+    font-size:19px;
+    color:var(--maroon-dark);
+    display:flex; align-items:baseline; gap:8px;
+  }
+  .card h2 .en{font-size:12px;color:var(--ink-soft);font-weight:600;text-transform:uppercase;letter-spacing:1px;}
+
+  label{
+    display:block;
+    font-size:13px;
+    color:var(--ink-soft);
+    margin:14px 0 6px;
+    font-weight:600;
+  }
+  label .en{font-weight:500;color:#9c8a76;}
+
+  select{
+    width:100%;
+    padding:11px 12px;
+    border-radius:9px;
+    border:1.5px solid var(--line);
+    background:#FFFDF9;
+    font-size:16px;
+    color:var(--ink);
+    font-family:inherit;
+    appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9'%3E%3Cpath d='M1 1l6 6 6-6' stroke='%237C2D3B' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;
+    background-position:right 14px center;
+    padding-right:36px;
+  }
+  select:focus{outline:3px solid #D9B45C66; outline-offset:1px; border-color:var(--gold);}
+
+  .meta-line{
+    margin-top:16px;
+    font-size:13px;
+    color:var(--ink-soft);
+    min-height:18px;
+  }
+  .meta-line b{color:var(--maroon-dark);}
+
+  .actions{
+    text-align:center;
+    margin:30px 0 6px;
+  }
+  button#go{
+    background:linear-gradient(180deg, var(--maroon) 0%, var(--maroon-dark) 100%);
+    color:#fff;
+    border:none;
+    padding:15px 38px;
+    border-radius:999px;
+    font-size:17px;
+    font-weight:700;
+    letter-spacing:0.3px;
+    cursor:pointer;
+    box-shadow:0 6px 18px rgba(90,31,42,0.30);
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  button#go:hover{transform:translateY(-1px); box-shadow:0 9px 22px rgba(90,31,42,0.36);}
+  button#go:active{transform:translateY(0px) scale(0.99);}
+  button#go .en{display:block;font-size:11px;font-weight:600;opacity:0.85;letter-spacing:1.2px;text-transform:uppercase;margin-top:2px;}
+
+  #result{
+    margin-top:18px;
+    display:none;
+  }
+  .result-card{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:28px 24px;
+    box-shadow:0 4px 20px rgba(122,46,46,0.08);
+    animation:rise .35s ease both;
+  }
+  @keyframes rise{from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);}}
+
+  .score-row{
+    display:flex;
+    align-items:center;
+    gap:22px;
+    justify-content:center;
+    flex-wrap:wrap;
+    padding-bottom:22px;
+    border-bottom:1px dashed var(--line);
+    margin-bottom:20px;
+  }
+  .ring-wrap{position:relative; width:140px; height:140px;}
+  .ring-wrap svg{transform:rotate(-90deg);}
+  .ring-bg{fill:none; stroke:#F1E6D2; stroke-width:11;}
+  .ring-fg{fill:none; stroke:url(#ringGrad); stroke-width:11; stroke-linecap:round; transition:stroke-dashoffset 0.9s cubic-bezier(.4,0,.2,1);}
+  .ring-label{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+  }
+  .ring-label .num{font-size:34px; font-weight:800; color:var(--maroon-dark); line-height:1;}
+  .ring-label .den{font-size:13px; color:var(--ink-soft); margin-top:2px;}
+
+  .score-text{max-width:280px;}
+  .score-text .te{font-size:18px; font-weight:700; color:var(--maroon-dark); margin-bottom:4px;}
+  .score-text .en{font-size:13px; color:var(--ink-soft);}
+
+  .pair{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+  }
+  @media (max-width:640px){ .pair{grid-template-columns:1fr;} }
+
+  .person{
+    background:var(--cream);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:16px 16px 14px;
+  }
+  .person .role{
+    font-size:12px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+    color:var(--gold); margin-bottom:6px;
+  }
+  .person .nak{font-size:17px; font-weight:700; color:var(--maroon-dark);}
+  .person .nak .en{display:block; font-size:12px; font-weight:600; color:var(--ink-soft); margin-top:1px;}
+  .attr-grid{
+    margin-top:12px;
+    display:grid;
+    grid-template-columns:auto 1fr;
+    row-gap:7px;
+    column-gap:10px;
+    font-size:14px;
+  }
+  .attr-grid dt{color:var(--ink-soft); font-weight:600;}
+  .attr-grid dd{margin:0; font-weight:700; color:var(--ink);}
+  .attr-grid dd .en{font-weight:500; color:#9c8a76; font-size:12.5px;}
+
+  .note{
+    margin-top:20px;
+    font-size:12.5px;
+    color:#9c8a76;
+    text-align:center;
+    line-height:1.5;
+  }
+
+  footer{
+    text-align:center;
+    margin-top:40px;
+    font-size:12px;
+    color:#b3a48d;
+  }
+
+  .hidden{display:none;}
+  .error-box{
+    margin-top:18px;
+    background:#FBEDE8;
+    border:1px solid #E7B9A8;
+    color:var(--warn);
+    padding:12px 16px;
+    border-radius:10px;
+    font-size:14px;
+    text-align:center;
+  }
+
+  .letterhead{
+    text-align:center;
+    margin:0 auto 8px;
+    max-width:640px;
+  }
+  .letterhead .inst-te{
+    font-size:25px;
+    font-weight:800;
+    color:var(--maroon-dark);
+    letter-spacing:0.3px;
+    line-height:1.25;
+  }
+  .letterhead .inst-en{
+    font-size:11.5px;
+    font-weight:700;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:var(--gold);
+    margin-top:3px;
+  }
+  .letterhead .place{
+    font-size:13.5px;
+    color:var(--ink-soft);
+    margin-top:2px;
+  }
+  .letterhead .proprietor{
+    margin-top:10px;
+    font-size:14.5px;
+    color:var(--ink);
+    font-weight:700;
+  }
+  .letterhead .proprietor .en{
+    display:block;
+    font-size:11.5px;
+    font-weight:600;
+    color:var(--ink-soft);
+    letter-spacing:0.4px;
+    margin-top:1px;
+  }
+  .letterhead-rule{
+    height:1px;
+    width:100%;
+    max-width:520px;
+    margin:16px auto 0;
+    background:linear-gradient(90deg, transparent, var(--line), transparent);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="letterhead">
+    <div class="inst-te">శ్రీ మంజీర జ్యోతిష్యాలయం</div>
+    <div class="place">పిఠాపురం</div>
+    <div class="proprietor">Dr.K.R.K. పరమహంస</div>
+  </div>
+  <div class="letterhead-rule"></div>
+
+  <header class="top">
+    <svg class="kalasha" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M32 6c4 4 4 8 0 10s-4 6 0 10" stroke="#B8862F" stroke-width="2.2" stroke-linecap="round"/>
+      <circle cx="32" cy="30" r="4" fill="#B8862F"/>
+      <path d="M16 30c0 14 7 26 16 26s16-12 16-26c0-3-2-5-5-5H21c-3 0-5 2-5 5z" fill="#7C2D3B"/>
+      <path d="M16 30c0 14 7 26 16 26" stroke="#5A1F2A" stroke-width="0" />
+      <ellipse cx="32" cy="30" rx="16" ry="5" fill="#D9B45C"/>
+      <path d="M22 24c2-3 5-4 10-4s8 1 10 4" stroke="#B8862F" stroke-width="2" stroke-linecap="round" fill="none"/>
+    </svg>
+    <h1>నక్షత్ర పొంతన లెక్కింపు<span class="en">Nakshatra Porutham &middot; Marriage Compatibility</span></h1>
+    <p class="sub">వరుడు మరియు వధువు నక్షత్రం &amp; పాదం ఎంచుకొని పొంతన పాయింట్లు చూడండి.<br>
+    Select the groom's and bride's nakshatram &amp; padam to view the compatibility points.</p>
+    <div class="rule"></div>
+  </header>
+
+  <div class="panels">
+    <div class="card">
+      <h2>వరుడు <span class="en">Groom</span></h2>
+      <label>నక్షత్రం <span class="en">(Nakshatram)</span></label>
+      <select id="groomNak"></select>
+      <label>పాదం <span class="en">(Padam)</span></label>
+      <select id="groomPada"></select>
+    </div>
+
+    <div class="card">
+      <h2>వధువు <span class="en">Bride</span></h2>
+      <label>నక్షత్రం <span class="en">(Nakshatram)</span></label>
+      <select id="brideNak"></select>
+      <label>పాదం <span class="en">(Padam)</span></label>
+      <select id="bridePada"></select>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button id="go">పొంతన చూడండి<span class="en">Check Compatibility</span></button>
+  </div>
+
+  <div id="errorBox" class="error-box hidden"></div>
+
+  <div id="result">
+    <div class="result-card">
+      <div class="score-row">
+        <div class="ring-wrap">
+          <svg width="140" height="140" viewBox="0 0 140 140">
+            <defs>
+              <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#D9B45C"/>
+                <stop offset="100%" stop-color="#7C2D3B"/>
+              </linearGradient>
+            </defs>
+            <circle class="ring-bg" cx="70" cy="70" r="58"/>
+            <circle class="ring-fg" id="ringFg" cx="70" cy="70" r="58" stroke-dasharray="364.4" stroke-dashoffset="364.4"/>
+          </svg>
+          <div class="ring-label">
+            <div class="num" id="scoreNum">0</div>
+            <div class="den">/ 36</div>
+          </div>
+        </div>
+        <div class="score-text">
+          <div class="te">మొత్తం పొంతన పాయింట్లు</div>
+          <div class="en">Total compatibility points out of the 36-point (Ashtakoota) system.</div>
+        </div>
+      </div>
+
+      <div class="pair">
+        <div class="person">
+          <div class="role">వరుడు &middot; Groom</div>
+          <div class="nak" id="rGroomNak"></div>
+          <dl class="attr-grid">
+            <dt>జంతువు <span class="en">Animal</span></dt><dd id="rGroomAnimal"></dd>
+            <dt>గణం <span class="en">Ganam</span></dt><dd id="rGroomGanam"></dd>
+            <dt>నాడి <span class="en">Nadi</span></dt><dd id="rGroomNadi"></dd>
+          </dl>
+        </div>
+        <div class="person">
+          <div class="role">వధువు &middot; Bride</div>
+          <div class="nak" id="rBrideNak"></div>
+          <dl class="attr-grid">
+            <dt>జంతువు <span class="en">Animal</span></dt><dd id="rBrideAnimal"></dd>
+            <dt>గణం <span class="en">Ganam</span></dt><dd id="rBrideGanam"></dd>
+            <dt>నాడి <span class="en">Nadi</span></dt><dd id="rBrideNadi"></dd>
+          </dl>
+        </div>
+      </div>
+
+      <p class="note">ఈ స్కోరు సంప్రదాయ అష్టకూట పట్టిక ఆధారంగా లెక్కించబడింది. తుది నిర్ణయం కోసం దయచేసి అనుభవజ్ఞులైన పురోహితులు/జ్యోతిష్కులను సంప్రదించండి.<br>
+      This score is calculated from the traditional Ashtakoota table provided. Please consult an experienced priest/astrologer for a final decision.</p>
+    </div>
+  </div>
+
+  <footer>నక్షత్ర పొంతన పట్టిక డేటా ఆధారంగా &middot; Built from the supplied vadhu-vara gana table</footer>
+</div>
+
+<script>
+const DATA = {"units": [{"name": "అశ్విని", "padams": [1, 2, 3, 4], "animal": "గుర్రం", "ganam": "దేవ", "nadi": "ఆది", "raw": "అశ్విని"}, {"name": "భరణి", "padams": [1, 2, 3, 4], "animal": "ఏనుగు", "ganam": "మనుష్య", "nadi": "మధ్య", "raw": "భరణి"}, {"name": "కృత్తిక", "padams": [1], "animal": "మేక", "ganam": "రాక్షస", "nadi": "అంత్య", "raw": "కృత్తిక 1"}, {"name": "కృత్తిక", "padams": [2, 3, 4], "animal": "మేక", "ganam": "రాక్షస", "nadi": "అంత్య", "raw": "కృత్తిక 2,3,4"}, {"name": "రోహిణి", "padams": [1, 2, 3, 4], "animal": "పాము", "ganam": "మనుష్య", "nadi": "అంత్య", "raw": "రోహిణి"}, {"name": "మృగశిర", "padams": [1, 2], "animal": "పాము", "ganam": "దేవ", "nadi": "మధ్య", "raw": "మృగశిర 1, 2"}, {"name": "మృగశిర", "padams": [3, 4], "animal": "పాము", "ganam": "దేవ", "nadi": "మధ్య", "raw": "మృగశిర 3,4"}, {"name": "ఆరుద్ర", "padams": [1, 2, 3, 4], "animal": "కుక్క", "ganam": "మనుష్య", "nadi": "ఆది", "raw": "ఆరుద్ర"}, {"name": "పునర్వసు", "padams": [1, 2, 3], "animal": "పిల్లి", "ganam": "దేవ", "nadi": "ఆది", "raw": "పునర్వసు1.2.3"}, {"name": "పునర్వసు", "padams": [4], "animal": "పిల్లి", "ganam": "దేవ", "nadi": "ఆది", "raw": "పునర్వసు 4"}, {"name": "పుష్యమి", "padams": [1, 2, 3, 4], "animal": "మేక", "ganam": "దేవ", "nadi": "మధ్య", "raw": "పుష్యమి"}, {"name": "ఆశ్లేష", "padams": [1, 2, 3, 4], "animal": "పిల్లి", "ganam": "రాక్షస", "nadi": "అంత్య", "raw": "ఆశ్లేష"}, {"name": "మఖ", "padams": [1, 2, 3, 4], "animal": "ఎలుక", "ganam": "రాక్షస", "nadi": "అంత్య", "raw": "మఖ"}, {"name": "పూర్వఫల్గుణి", "padams": [1, 2, 3, 4], "animal": "ఎలుక", "ganam": "మనుష్య", "nadi": "మధ్య", "raw": "పూర్వఫల్గుణి"}, {"name": "ఉత్తర", "padams": [1], "animal": "గోవు", "ganam": "మనుష్య", "nadi": "ఆది", "raw": "ఉత్తర 1"}, {"name": "ఉత్తర", "padams": [2, 3, 4], "animal": "గోవు", "ganam": "మనుష్య", "nadi": "ఆది", "raw": "ఉత్తర 2,3,4"}, {"name": "హస్త", "padams": [1, 2, 3, 4], "animal": "దున్న", "ganam": "దేవ", "nadi": "ఆది", "raw": "హస్త"}, {"name": "చిత్త", "padams": [1, 2], "animal": "పులి", "ganam": "రాక్షస", "nadi": "మధ్య", "raw": "చిత్త 1,2"}, {"name": "చిత్త", "padams": [3, 4], "animal": "పులి", "ganam": "రాక్షస", "nadi": "మధ్య", "raw": "చిత్త 3,4"}, {"name": "స్వాతి", "padams": [1, 2, 3, 4], "animal": "దున్న", "ganam": "దేవ", "nadi": "అంత్య", "raw": "స్వాతి"}, {"name": "విశాఖ", "padams": [1, 2, 3], "animal": "పులి", "ganam": "రాక్షస", "nadi": "అంత్య", "raw": "విశాఖ 1,2,3"}, {"name": "విశాఖ", "padams": [4], "animal": "పులి", "ganam": "రాక్షస", "nadi": "అంత్య", "raw": "విశాఖ  4"}, {"name": "అనూరాధ", "padams": [1, 2, 3, 4], "animal": "లేడి", "ganam": "దేవ", "nadi": "మధ్య", "raw": "అనూరాధ"}, {"name": "జ్యేష్ట", "padams": [1, 2, 3, 4], "animal": "లేడి", "ganam": "రాక్షస", "nadi": "ఆది", "raw": "జ్యేష్ట"}, {"name": "మూల", "padams": [1, 2, 3, 4], "animal": "కుక్క", "ganam": "రాక్షస", "nadi": "ఆది", "raw": "మూల"}, {"name": "పూర్వాఆషాఢ", "padams": [1, 2, 3, 4], "animal": "కోతి", "ganam": "మనుష్య", "nadi": "మధ్య", "raw": "పూర్వాఆషాఢ"}, {"name": "ఉత్తరాషాఢ", "padams": [1], "animal": "ముంగిస", "ganam": "మనుష్య", "nadi": "అంత్య", "raw": "ఉత్తరాషాఢ 1"}, {"name": "ఉత్తరాషాఢ", "padams": [2, 3, 4], "animal": "ముంగిస", "ganam": "మనుష్య", "nadi": "అంత్య", "raw": "ఉత్తరాషాఢ 2,3,4"}, {"name": "శ్రవణము", "padams": [1, 2, 3, 4], "animal": "కోతి", "ganam": "దేవ", "nadi": "అంత్య", "raw": "శ్రవణము"}, {"name": "ధనిష్ట", "padams": [1, 2], "animal": "సింహం", "ganam": "రాక్షస", "nadi": "మధ్య", "raw": "ధనిష్ట 1,2"}, {"name": "ధనిష్ట", "padams": [3, 4], "animal": "సింహం", "ganam": "రాక్షస", "nadi": "మధ్య", "raw": "ధనిష్ట 3,4"}, {"name": "శతభిష", "padams": [1, 2, 3, 4], "animal": "గుర్రం", "ganam": "రాక్షస", "nadi": "ఆది", "raw": "శతభిష"}, {"name": "పూర్వాభద్ర", "padams": [1, 2, 3], "animal": "సింహం", "ganam": "మనుష్య", "nadi": "ఆది", "raw": "పూర్వాభద్ర 1,2,3"}, {"name": "పూర్వాభద్ర", "padams": [4], "animal": "సింహం", "ganam": "మనుష్య", "nadi": "ఆది", "raw": "పూర్వాభద్ర 4"}, {"name": "ఉత్తరాభద్ర", "padams": [1, 2, 3, 4], "animal": "గోవు", "ganam": "మనుష్య", "nadi": "మధ్య", "raw": "ఉత్తరాభద్ర"}, {"name": "రేవతి", "padams": [1, 2, 3, 4], "animal": "ఏనుగు", "ganam": "దేవ", "nadi": "అంత్య", "raw": "రేవతి"}], "matrix": [[28, 33, 28, 18, 21, 22, 26, 17, 18, 22, 31, 27, 21, 26, 17, 11, 9, 13, 22, 26, 22, 19, 26, 15, 13, 27, 24, 26, 24, 21, 21, 15, 16, 14, 24, 26], [34, 28, 29, 19, 22, 15, 18, 26, 26, 30, 23, 24, 21, 19, 28, 21, 19, 6, 14, 29, 22, 19, 17, 19, 20, 20, 27, 28, 26, 10, 10, 20, 24, 22, 16, 28], [27, 27, 28, 17, 9, 15, 19, 20, 21, 25, 26, 23, 17, 21, 22, 15, 15, 18, 27, 15, 19, 16, 20, 26, 24, 19, 14, 15, 10, 25, 25, 27, 19, 17, 19, 11], [18, 18, 19, 28, 19, 25, 16, 17, 18, 22, 23, 20, 19, 23, 24, 21, 21, 23, 22, 10, 14, 21, 25, 31, 20, 13, 9, 14, 10, 23, 29, 31, 23, 20, 22, 14], [23, 23, 10, 19, 28, 36, 27, 23, 23, 27, 26, 13, 12, 26, 28, 25, 26, 20, 19, 15, 9, 16, 30, 24, 14, 20, 11, 17, 18, 20, 26, 24, 30, 27, 26, 19], [22, 13, 15, 27, 34, 28, 20, 25, 23, 26, 19, 22, 21, 17, 25, 23, 27, 13, 10, 25, 17, 23, 22, 25, 15, 11, 18, 21, 24, 13, 19, 27, 29, 26, 17, 27], [27, 18, 21, 18, 25, 20, 28, 33, 31, 19, 10, 15, 24, 20, 28, 30, 34, 21, 14, 27, 19, 14, 11, 13, 23, 18, 24, 20, 25, 12, 13, 21, 23, 27, 17, 27], [19, 27, 21, 18, 24, 26, 34, 28, 25, 13, 20, 13, 23, 29, 22, 24, 24, 27, 20, 27, 20, 13, 17, 4, 16, 27, 27, 22, 22, 17, 18, 11, 16, 19, 27, 27], [19, 26, 22, 19, 23, 24, 32, 24, 28, 16, 23, 16, 22, 27, 21, 23, 24, 25, 18, 27, 21, 13, 20, 5, 13, 26, 27, 27, 23, 17, 18, 11, 17, 19, 27, 28], [21, 28, 23, 20, 24, 25, 19, 10, 14, 28, 35, 28, 15, 20, 14, 18, 18, 20, 20, 27, 20, 19, 26, 10, 8, 20, 21, 28, 27, 21, 12, 7, 11, 17, 25, 25], [30, 21, 26, 23, 24, 17, 10, 18, 21, 35, 28, 30, 18, 14, 23, 26, 27, 12, 11, 26, 21, 20, 19, 22, 17, 11, 22, 26, 25, 13, 4, 14, 18, 24, 18, 27], [25, 23, 22, 19, 12, 21, 13, 12, 15, 28, 28, 28, 15, 15, 17, 20, 20, 26, 25, 11, 16, 15, 20, 26, 22, 16, 8, 12, 13, 27, 18, 18, 12, 18, 20, 12], [21, 21, 17, 18, 11, 19, 22, 22, 21, 16, 18, 16, 28, 30, 26, 16, 16, 22, 25, 11, 17, 24, 26, 34, 24, 21, 11, 5, 4, 18, 24, 25, 18, 17, 18, 12], [27, 19, 21, 22, 25, 17, 20, 28, 27, 22, 16, 16, 30, 28, 34, 24, 22, 8, 11, 25, 19, 26, 24, 24, 19, 19, 27, 21, 18, 4, 11, 19, 24, 23, 16, 24], [18, 27, 22, 23, 27, 25, 28, 21, 21, 16, 25, 18, 26, 34, 28, 18, 16, 14, 17, 26, 17, 24, 32, 19, 10, 27, 28, 22, 20, 11, 18, 12, 16, 15, 26, 24], [13, 21, 16, 21, 25, 23, 30, 23, 23, 19, 28, 21, 17, 25, 19, 28, 25, 24, 16, 25, 16, 18, 27, 13, 15, 28, 29, 26, 25, 16, 16, 10, 14, 18, 29, 27], [11, 20, 16, 21, 26, 26, 33, 23, 23, 19, 28, 21, 17, 22, 17, 26, 28, 27, 19, 36, 17, 19, 26, 12, 14, 26, 27, 23, 24, 19, 19, 7, 14, 19, 27, 27], [13, 6, 19, 25, 20, 12, 19, 26, 24, 20, 12, 26, 23, 9, 15, 24, 27, 28, 20, 19, 26, 28, 11, 25, 28, 13, 21, 17, 19, 18, 18, 24, 18, 22, 11, 21], [22, 15, 28, 23, 20, 12, 13, 20, 18, 20, 12, 26, 25, 10, 17, 17, 20, 21, 28, 27, 34, 24, 7, 21, 28, 13, 21, 25, 27, 26, 20, 26, 20, 15, 4, 13], [27, 29, 17, 12, 16, 27, 27, 26, 26, 28, 28, 15, 13, 25, 25, 25, 27, 21, 28, 28, 20, 10, 23, 18, 23, 26, 18, 22, 23, 27, 21, 20, 25, 19, 20, 13], [22, 22, 20, 15, 10, 18, 19, 21, 21, 22, 21, 19, 17, 19, 18, 17, 18, 27, 34, 18, 28, 18, 17, 21, 28, 21, 13, 17, 17, 32, 26, 26, 22, 16, 13, 5], [16, 16, 14, 19, 14, 22, 13, 14, 14, 19, 18, 15, 21, 23, 21, 18, 19, 28, 23, 8, 17, 28, 27, 31, 23, 17, 9, 12, 12, 27, 27, 26, 22, 21, 18, 9], [24, 14, 19, 24, 27, 20, 11, 16, 21, 26, 18, 21, 24, 20, 29, 26, 27, 12, 7, 22, 17, 28, 28, 31, 16, 14, 22, 25, 26, 12, 12, 22, 24, 24, 18, 27], [12, 18, 24, 29, 22, 22, 13, 3, 6, 10, 20, 26, 31, 23, 16, 13, 12, 25, 20, 17, 20, 31, 30, 28, 15, 17, 17, 20, 20, 25, 25, 18, 11, 9, 21, 21], [12, 20, 24, 19, 13, 14, 21, 15, 12, 8, 17, 24, 25, 19, 9, 13, 13, 27, 27, 21, 27, 24, 26, 16, 28, 27, 25, 15, 15, 21, 25, 21, 11, 17, 25, 27], [27, 20, 19, 13, 20, 12, 18, 26, 26, 23, 13, 17, 21, 19, 27, 27, 26, 11, 11, 26, 19, 18, 18, 19, 27, 28, 34, 24, 23, 8, 15, 22, 29, 32, 23, 32], [25, 27, 14, 8, 11, 18, 24, 26, 26, 23, 24, 9, 11, 27, 28, 28, 27, 20, 20, 19, 12, 11, 25, 19, 25, 34, 28, 18, 15, 15, 22, 22, 28, 31, 32, 23], [28, 29, 16, 14, 17, 22, 20, 22, 22, 27, 28, 13, 6, 22, 23, 26, 25, 17, 24, 23, 16, 14, 28, 22, 16, 25, 19, 28, 25, 25, 17, 17, 23, 30, 32, 23], [27, 26, 13, 10, 17, 26, 23, 21, 23, 28, 26, 15, 17, 18, 20, 23, 25, 18, 25, 23, 16, 14, 28, 23, 17, 25, 15, 24, 28, 30, 20, 18, 23, 32, 31, 24], [20, 10, 26, 23, 20, 12, 8, 17, 17, 22, 13, 28, 18, 5, 12, 16, 18, 16, 24, 26, 30, 28, 14, 28, 21, 9, 16, 25, 21, 28, 18, 23, 21, 26, 15, 22], [20, 11, 26, 30, 27, 19, 10, 19, 19, 14, 5, 20, 25, 11, 19, 17, 21, 18, 19, 22, 25, 28, 12, 26, 29, 16, 13, 18, 21, 20, 28, 33, 28, 18, 7, 14], [15, 21, 28, 32, 25, 25, 18, 10, 10, 7, 15, 20, 26, 20, 13, 11, 8, 26, 26, 19, 26, 26, 21, 19, 22, 23, 23, 18, 18, 25, 33, 28, 19, 9, 17, 16], [18, 25, 20, 24, 31, 31, 24, 17, 17, 13, 20, 14, 19, 25, 17, 15, 17, 18, 19, 28, 21, 21, 27, 12, 15, 30, 29, 24, 25, 20, 27, 19, 28, 18, 23, 20], [14, 21, 16, 19, 26, 26, 25, 18, 18, 18, 25, 18, 16, 22, 14, 16, 18, 19, 12, 20, 14, 21, 27, 11, 15, 31, 30, 28, 30, 25, 17, 7, 16, 28, 33, 30], [24, 15, 18, 21, 25, 17, 16, 25, 27, 26, 19, 20, 17, 15, 25, 27, 26, 9, 3, 19, 12, 19, 20, 22, 24, 22, 31, 29, 29, 14, 6, 16, 21, 33, 28, 34], [25, 24, 11, 14, 17, 26, 25, 24, 25, 24, 27, 13, 12, 22, 22, 24, 26, 20, 13, 11, 5, 12, 27, 22, 27, 30, 21, 19, 22, 22, 14, 16, 18, 29, 33, 28]], "nakEn": {"అశ్విని": "Ashwini", "భరణి": "Bharani", "కృత్తిక": "Krittika", "రోహిణి": "Rohini", "మృగశిర": "Mrigashira", "ఆరుద్ర": "Ardra", "పునర్వసు": "Punarvasu", "పుష్యమి": "Pushyami", "ఆశ్లేష": "Ashlesha", "మఖ": "Magha", "పూర్వఫల్గుణి": "Purva Phalguni", "ఉత్తర": "Uttara Phalguni", "హస్త": "Hasta", "చిత్త": "Chitta (Chitra)", "స్వాతి": "Swati", "విశాఖ": "Vishakha", "అనూరాధ": "Anuradha", "జ్యేష్ట": "Jyeshtha", "మూల": "Moola", "పూర్వాఆషాఢ": "Purvashada", "ఉత్తరాషాఢ": "Uttarashada", "శ్రవణము": "Shravanam", "ధనిష్ట": "Dhanishta", "శతభిష": "Shatabhisham", "పూర్వాభద్ర": "Purvabhadra", "ఉత్తరాభద్ర": "Uttarabhadra", "రేవతి": "Revati"}, "animalEn": {"గుర్రం": "Horse", "ఏనుగు": "Elephant", "మేక": "Goat", "పాము": "Serpent", "కుక్క": "Dog", "పిల్లి": "Cat", "ఎలుక": "Rat", "గోవు": "Cow", "దున్న": "Buffalo", "పులి": "Tiger", "లేడి": "Deer", "కోతి": "Monkey", "ముంగిస": "Mongoose", "సింహం": "Lion"}, "ganamEn": {"దేవ": "Deva", "మనుష్య": "Manushya", "రాక్షస": "Rakshasa"}, "nadiEn": {"ఆది": "Adi", "మధ్య": "Madhya", "అంత్య": "Antya"}};
+
+const teluguDigits = {1:"౧",2:"౨",3:"౩",4:"౪"};
+
+function uniqueNakshatraNames(){
+  const seen = [];
+  const set = new Set();
+  DATA.units.forEach(u=>{ if(!set.has(u.name)){ set.add(u.name); seen.push(u.name);} });
+  return seen;
+}
+
+function populateNakSelect(sel){
+  const names = uniqueNakshatraNames();
+  sel.innerHTML = names.map(n=>`<option value="${n}">${n} (${DATA.nakEn[n]||""})</option>`).join("");
+}
+function populatePadaSelect(sel){
+  sel.innerHTML = [1,2,3,4].map(p=>`<option value="${p}">పాదం ${teluguDigits[p]} &middot; Padam ${p}</option>`).join("");
+}
+
+function findUnit(name, pada){
+  return DATA.units.find(u => u.name === name && u.padams.includes(Number(pada)));
+}
+
+function unitIndex(name, pada){
+  return DATA.units.findIndex(u => u.name === name && u.padams.includes(Number(pada)));
+}
+
+const groomNak = document.getElementById('groomNak');
+const groomPada = document.getElementById('groomPada');
+const brideNak = document.getElementById('brideNak');
+const bridePada = document.getElementById('bridePada');
+
+populateNakSelect(groomNak);
+populateNakSelect(brideNak);
+populatePadaSelect(groomPada);
+populatePadaSelect(bridePada);
+
+const resultBox = document.getElementById('result');
+const errorBox = document.getElementById('errorBox');
+
+document.getElementById('go').addEventListener('click', ()=>{
+  const gi = unitIndex(groomNak.value, groomPada.value);
+  const bi = unitIndex(brideNak.value, bridePada.value);
+  if(gi === -1 || bi === -1){
+    errorBox.textContent = "ఎంపికలో లోపం ఉంది, దయచేసి మళ్ళీ ప్రయత్నించండి. (Selection error, please try again.)";
+    errorBox.classList.remove('hidden');
+    resultBox.style.display = 'none';
+    return;
+  }
+  errorBox.classList.add('hidden');
+
+  const gUnit = DATA.units[gi];
+  const bUnit = DATA.units[bi];
+  const score = DATA.matrix[bi][gi]; // row = bride, col = groom
+
+  document.getElementById('rGroomNak').innerHTML = `${gUnit.name} <span class="en">${DATA.nakEn[gUnit.name]||""} &middot; Padam ${groomPada.value}</span>`;
+  document.getElementById('rGroomAnimal').innerHTML = `${gUnit.animal} <span class="en">${DATA.animalEn[gUnit.animal]}</span>`;
+  document.getElementById('rGroomGanam').innerHTML = `${gUnit.ganam} <span class="en">${DATA.ganamEn[gUnit.ganam]}</span>`;
+  document.getElementById('rGroomNadi').innerHTML = `${gUnit.nadi} <span class="en">${DATA.nadiEn[gUnit.nadi]}</span>`;
+
+  document.getElementById('rBrideNak').innerHTML = `${bUnit.name} <span class="en">${DATA.nakEn[bUnit.name]||""} &middot; Padam ${bridePada.value}</span>`;
+  document.getElementById('rBrideAnimal').innerHTML = `${bUnit.animal} <span class="en">${DATA.animalEn[bUnit.animal]}</span>`;
+  document.getElementById('rBrideGanam').innerHTML = `${bUnit.ganam} <span class="en">${DATA.ganamEn[bUnit.ganam]}</span>`;
+  document.getElementById('rBrideNadi').innerHTML = `${bUnit.nadi} <span class="en">${DATA.nadiEn[bUnit.nadi]}</span>`;
+
+  document.getElementById('scoreNum').textContent = score;
+  const ring = document.getElementById('ringFg');
+  const circumference = 2 * Math.PI * 58;
+  const frac = Math.max(0, Math.min(36, score)) / 36;
+  ring.setAttribute('stroke-dasharray', circumference.toFixed(1));
+  ring.style.strokeDashoffset = circumference.toFixed(1);
+  resultBox.style.display = 'block';
+  requestAnimationFrame(()=>{
+    ring.style.strokeDashoffset = (circumference * (1 - frac)).toFixed(1);
+  });
+  resultBox.scrollIntoView({behavior:'smooth', block:'nearest'});
+});
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(err => console.warn('SW registration failed:', err));
+  });
+}
+</script>
+</body>
+</html>
